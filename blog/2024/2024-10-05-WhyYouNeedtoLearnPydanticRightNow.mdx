@@ -1,0 +1,111 @@
+---
+slug: why-you-need-to-learn-pydantic-right-now
+title: "Why You Need to Learn Pydantic Right Now!"
+authors:
+  sudipnext
+tags: [pydantic, python, data-validation, type-safety, data-cleaning]
+---
+
+### Introduction
+
+Have you ever wished Python could be even stricter about data types? Well, let me tell you a story about how I fell in love with `Pydantic`. It might just change the way you work with Python forever!
+
+<!-- truncate -->
+
+![Python + Pydantic](https://miro.medium.com/v2/resize:fit:786/format:webp/1*oxEd2292nIaUYsBn5tPeqQ.png)
+![TypesEverywhere](https://miro.medium.com/v2/resize:fit:786/format:webp/0*DSLmUdynwpCPosE2.jpg)
+
+## The Problem: Messy Data
+
+Picture this: I'm working on a big travel booking website. Everything's going great until I start dealing with data from other companies' systems. Suddenly, I'm getting dates as strings, numbers as text, and all sorts of mixed-up information. It's a mess!
+
+Here's what some of that messy data looked like:
+
+```python
+messy_data = {
+    "booking_date": "2023–05–15T14:30:00",
+    "hotel_license": 12345678,
+    "guest_age": "35"
+}
+```
+
+I couldn't change how other systems worked, but I needed a way to clean up this data before using it in my own code.
+
+That's when I discovered `Pydantic`. It's like a magical tool that takes messy data and turns it into exactly what you need. Here's how it works:
+
+1. You tell `Pydantic` what kind of data you're expecting.
+2. You give it the messy data.
+3. `Pydantic` cleans it up and hands it back to you
+
+Let me show you:
+
+```python
+from pydantic import field_validator, BaseModel
+from datetime import datetime
+
+class Booking(BaseModel):
+    booking_date: datetime
+    hotel_license: str
+    guest_age: int
+    
+    @field_validator('guest_age')
+    def check_age(cls, v):
+        if v < 0 or v > 120:
+            raise ValueError('Age must be between 0 and 120')
+        return v
+
+# remember date strings can be represented in many ways making it represented
+# in many ways making it consistent can be challenging but it's worth the time
+booking_date_str = "2023-05-15T14:30:00"
+booking_date = datetime.strptime(booking_date_str, "%Y-%m-%dT%H:%M:%S")
+
+# Now, let's use it!
+clean_data = Booking(
+    booking_date=booking_date,
+    hotel_license='12345678',
+    guest_age=35
+)
+
+print(clean_data)
+# Output: booking_date=datetime.datetime(2023, 5, 15, 14, 30) 
+# hotel_license='12345678' guest_age=35
+```
+
+We get validation error like this if we use the age greater than 120 or less than 0:
+
+```bash
+Traceback (most recent call last):
+  File "/home/sudipnext/Documents/test.py", line 20, in <module>
+    clean_data = Booking(
+  File "/home/sudipnext/Documents/env/lib/python3.10/site-packages/pydantic/main.py", line 212, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+pydantic_core._pydantic_core.ValidationError: 1 validation error for Booking
+guest_age
+  Value error, Age must be between 0 and 120 [type=value_error, input_value=1122, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.9/v/value_error
+```
+
+Just like magic, `Pydantic` turned our messy data into exactly what we needed!
+
+## Why Pydantic is Amazing
+
+1. **It's Like a Data Cleaning Robot**: `Pydantic` automatically fixes common data issues for you.
+2. **It Keeps Your Data Safe**: You can add rules to make sure your data makes sense (like checking that ages are reasonable).
+3. **It Saves Time**: Instead of writing lots of code to check and fix data, `Pydantic` does it for you.
+4. **It Plays Nice with Others**: Even if other systems give you weird data, `Pydantic` helps you work with it easily.
+
+## My Happy Ending (And Why You Should Care)
+
+If you're a Python coder, learning `Pydantic` could make your life so much easier. It's like having a super-smart assistant that always keeps your data tidy and correct.
+
+Don't wait for data problems to give you a headache. Give `Pydantic` a try today. Trust me, your future self will thank you!
+
+Have you used `Pydantic` in your projects? Share your experiences in the comments below! If you want me to cover whole pydantic concepts just let me know.
+
+### Conclusion
+
+Pydantic is more than just a validation library - it's a game-changer for Python developers who work with data. Whether you're building APIs, processing user input, or integrating with external systems, Pydantic helps you maintain data integrity while keeping your code clean and readable.
+
+The best part? It's not just about catching errors - it's about preventing them in the first place. By defining clear data models with Pydantic, you create a contract that makes your code more reliable and easier to maintain.
+
+So what are you waiting for? Start incorporating Pydantic into your next Python project and experience the difference it makes!

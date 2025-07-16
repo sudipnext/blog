@@ -92,6 +92,7 @@ ai:
   label: AI
   permalink: /ai
   description: Articles and tutorials on artificial intelligence, covering algorithms, applications, and industry trends.
+
 google:
   label: Google
   permalink: /google
@@ -127,7 +128,6 @@ data-science:
   permalink: /data-science
   description: Insights and techniques used in the field of data science for analysis and modeling.
 
-
 feature-scaling:
   label: Feature Scaling
   permalink: /feature-scaling
@@ -147,7 +147,6 @@ training-testing-set:
   label: Training and Testing Set
   permalink: /training-testing-set
   description: Concepts and practices for splitting data into training and testing sets for model validation.
-
 
 programming:
   label: Programming
@@ -189,7 +188,6 @@ javascript:
   permalink: /javascript
   description: JavaScript programming language concepts, including ES6+ features, frameworks, and best practices.
 
-
 promises:
   label: Promises
   permalink: /promises
@@ -219,3 +217,63 @@ promise-chaining:
   label: Promise Chaining
   permalink: /promise-chaining
   description: Techniques for chaining multiple asynchronous operations using Promises in JavaScript.
+
+linear-algebra:
+  label: Linear Algebra
+  permalink: /linear-algebra
+  description: Mathematical concepts and operations involving vectors, matrices, and linear transformations.
+
+data-representation:
+  label: Data Representation
+  permalink: /data-representation
+  description: Methods and techniques for representing data in various formats for analysis and processing.
+
+entropy:
+  label: Entropy
+  permalink: /entropy
+  description: A measure of uncertainty or randomness in data, commonly used in information theory and machine learning.
+
+cross-entropy:
+  label: Cross Entropy
+  permalink: /cross-entropy
+  description: A loss function used in classification problems to measure the difference between predicted and actual probability distributions.
+
+softmax:
+  label: Softmax
+  permalink: /softmax
+  description: An activation function that converts a vector of real numbers into a probability distribution.
+
+logarithms:
+  label: Logarithms
+  permalink: /logarithms
+  description: Mathematical functions that are the inverse of exponential functions, commonly used in machine learning algorithms.
+
+exponential-function:
+  label: Exponential Function
+  permalink: /exponential-function
+  description: Mathematical functions of the form f(x) = a^x, fundamental in many areas of mathematics and science.
+
+dot-product:
+  label: Dot Product
+  permalink: /dot-product
+  description: A mathematical operation that takes two vectors and returns a scalar, essential in linear algebra and machine learning.
+
+transpose:
+  label: Transpose
+  permalink: /transpose
+  description: A matrix operation that flips a matrix over its diagonal, switching row and column indices.
+
+vector-matrix:
+  label: Vector Matrix
+  permalink: /vector-matrix
+  description: Mathematical structures used to represent and manipulate data in linear algebra and machine learning.
+
+deep-learning:
+  label: Deep Learning
+  permalink: /deep-learning
+  description: An overview of deep learning concepts, architectures, and applications in artificial intelligence.
+
+mathematics:
+  label: Mathematics
+  permalink: /mathematics
+  description: Fundamental mathematical concepts and techniques used in programming and data science.

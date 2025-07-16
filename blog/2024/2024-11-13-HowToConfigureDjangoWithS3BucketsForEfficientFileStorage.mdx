@@ -1,0 +1,365 @@
+---
+slug: how-to-configure-django-with-s3-buckets-efficient-file-storage
+title: "How to Configure Django with S3 Buckets for Efficient File Storage"
+authors:
+  sudipnext
+tags: [django, aws, s3, file-storage, boto3, django-storages, deployment, web-development]
+---
+
+### Introduction
+
+If you are searching for tutorials or ways to connect `Django` with `S3` bucket there are plenty of examples out there with many tutorials. I myself have gone through all of them setting up the `S3` buckets with `Django`. It wasn't my first time setting up but things are changed drastically. There are many ways how you can setup the Django application with `S3`. In this I will walk you through the most simplest configuration to setup the `S3` bucket with Django. So, without any delay, let's get started.
+
+<!-- truncate -->
+
+![Django S3 Configuration](https://miro.medium.com/v2/resize:fit:786/format:webp/1*XUPbqazzA_sMy6MKfYTf4A.png)
+
+:::tip
+**Important Note**: If you ever used deployment like `elastic beanstalk` and setup with `github actions` then you may encounter with each deployment your uploaded `media` get lost. So, we need a way to store the `media` so it's persistent.
+:::
+
+## Why Use S3 for Django File Storage?
+
+When deploying Django applications, especially on platforms like AWS Elastic Beanstalk or containerized environments, storing files locally can be problematic:
+
+1. **Persistence Issues**: Local files get lost during deployments
+2. **Scalability**: Multiple server instances can't share local files
+3. **Performance**: CDN integration for faster file delivery
+4. **Cost Efficiency**: S3's pricing model for file storage
+5. **Reliability**: AWS S3's 99.999999999% (11 9's) durability
+
+## Creating IAM User
+
+Creating a `IAM` policy for every application you create is essential for security purposes. You can create a `IAM` user policy like this and give full access to `S3` only.
+
+### Step 1: Create IAM User
+
+1. Go to AWS Console → IAM → Users
+2. Click "Create User"
+3. Enter username (e.g., `django-s3-user`)
+4. Select "Programmatic access"
+
+### Step 2: Attach S3 Policy
+
+![IAM User Creation](https://miro.medium.com/v2/resize:fit:786/format:webp/1*E79NiGXeV9Hk5fsZln52wg.png)
+
+Attach the following policy to your IAM user for S3 access:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::your-bucket-name/*",
+                "arn:aws:s3:::your-bucket-name"
+            ]
+        }
+    ]
+}
+```
+
+Then after the `IAM` user creation, you can hop into the `S3` for creating bucket.
+
+## Configuring S3 Bucket
+
+While creating `S3` bucket make sure you uncheck this so that since you are using this to serve media files so it should be accessible by public.
+
+![S3 Bucket Configuration](https://miro.medium.com/v2/resize:fit:786/format:webp/1*Dt8eBE-iTl3vld2c--L5WQ.png)
+
+### Step 1: Create S3 Bucket
+
+1. Go to AWS Console → S3
+2. Click "Create bucket"
+3. Enter bucket name (must be globally unique)
+4. Choose your region
+5. **Uncheck "Block all public access"** (for media files)
+
+### Step 2: Add Bucket Policy
+
+We will attach the policies later. After the bucket creation you can add this as your bucket policy:
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Statement1",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::yours3bucketnamehere/*"
+        }
+    ]
+}
+```
+
+Here in above we are saying that everything inside your S3 bucket is accessible to get object as defined in action.
+
+### Step 3: Configure CORS
+
+This is `CORS` setup:
+
+```json
+[
+    {
+        "AllowedHeaders": [
+            "*"
+        ],
+        "AllowedMethods": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE"
+        ],
+        "AllowedOrigins": [
+            "*"
+        ],
+        "ExposeHeaders": []
+    }
+]
+```
+
+After that let's go to `Django` to configure things.
+
+## Setting up S3 in Django
+
+To correctly setup `S3` in `Django` you need to install two packages:
+
+### Step 1: Install Required Packages
+
+1. **Boto3**:
+```bash
+pip install boto3
+```
+
+2. **Django Storages**:
+```bash
+pip install django-storages
+```
+
+### Step 2: Update Settings
+
+After installing these update your settings file like this:
+
+```python
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.postgres',
+    'whitenoise.runserver_nostatic',
+    # other settings
+    'storages',  # Add this
+]
+
+# .........
+# your other settings remain the same
+# add this end of your settings file
+
+# New storage configuration
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": os.environ.get('AWS_ACCESS_KEY_ID'),
+            "secret_key": os.environ.get('AWS_SECRET_ACCESS_KEY'),
+            "bucket_name": os.environ.get('AWS_STORAGE_BUCKET_NAME'),
+            "region_name": "ap-southeast-2",  # you can set your region of the bucket
+            "object_parameters": {
+                "CacheControl": "max-age=86400",
+            },
+            "querystring_auth": False,
+        },
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+```
+
+### Step 3: Environment Variables
+
+Create a `.env` file or set these environment variables:
+
+```bash
+AWS_ACCESS_KEY_ID=your_access_key_here
+AWS_SECRET_ACCESS_KEY=your_secret_key_here
+AWS_STORAGE_BUCKET_NAME=your_bucket_name_here
+```
+
+### Step 4: Update Django Settings for Production
+
+```python
+import os
+from decouple import config
+
+# AWS S3 Configuration
+AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = config('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_REGION_NAME = 'ap-southeast-2'  # Change to your region
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+
+# Media files configuration
+MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Static files (for local development)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+```
+
+## Advanced Configuration Options
+
+### Custom File Storage Classes
+
+You can create custom storage classes for more control:
+
+```python
+# storage_backends.py
+from storages.backends.s3boto3 import S3Boto3Storage
+
+class MediaStorage(S3Boto3Storage):
+    bucket_name = 'your-media-bucket'
+    file_overwrite = False
+    
+class StaticStorage(S3Boto3Storage):
+    bucket_name = 'your-static-bucket'
+    location = 'static'
+```
+
+### File Upload with Custom Path
+
+```python
+# models.py
+from django.db import models
+
+def user_directory_path(instance, filename):
+    # File will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+    return f'user_{instance.user.id}/{filename}'
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to=user_directory_path)
+```
+
+### Handling File URLs in Templates
+
+```django
+<!-- In your templates -->
+<img src="{{ user.profile.avatar.url }}" alt="User Avatar">
+
+<!-- For static files -->
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+```
+
+## Security Best Practices
+
+### 1. Use IAM Roles (Recommended for EC2/ECS)
+
+Instead of access keys, use IAM roles when deploying on AWS:
+
+```python
+# settings.py - for EC2/ECS deployment
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "bucket_name": os.environ.get('AWS_STORAGE_BUCKET_NAME'),
+            "region_name": "ap-southeast-2",
+            # Don't include access_key and secret_key - use IAM roles
+        },
+    },
+}
+```
+
+### 2. Restrict Bucket Access
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::YOUR-ACCOUNT-ID:user/django-s3-user"
+            },
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::your-bucket-name/*"
+        }
+    ]
+}
+```
+
+### 3. Enable Versioning and Lifecycle Policies
+
+- Enable S3 versioning for file recovery
+- Set up lifecycle policies to manage storage costs
+- Use S3 Intelligent Tiering for automatic cost optimization
+
+## Testing Your Configuration
+
+### Test File Upload
+
+```python
+# views.py
+from django.shortcuts import render
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+
+def test_upload(request):
+    if request.method == 'POST':
+        file = request.FILES.get('file')
+        if file:
+            # This will upload to S3
+            path = default_storage.save(f'test/{file.name}', ContentFile(file.read()))
+            file_url = default_storage.url(path)
+            return render(request, 'success.html', {'file_url': file_url})
+    return render(request, 'upload.html')
+```
+
+## Troubleshooting Common Issues
+
+### 1. CORS Errors
+Make sure your CORS configuration allows the necessary methods and origins.
+
+### 2. Permission Denied
+Check your IAM user permissions and bucket policy.
+
+### 3. File Not Found
+Verify your bucket name and region in settings.
+
+### 4. Slow Upload Times
+Consider using S3 Transfer Acceleration for faster uploads.
+
+## Conclusion
+
+Here I am setting the static files to serve directly from the application. I am only saving the media files to `S3`. After this your application is ready to be used. You can try uploading images. Everything which previously being saved to your local will be now saved to `S3` and you have a URL directly to access those. 
+
+You can generate these credentials of `AWS_ACCESS_KEY_ID` and things like that from the `IAM` users by going through that user and creating access keys.
+
+### Key Benefits:
+
+1. **Persistent Storage**: Files survive deployments and server restarts
+2. **Scalability**: Handle high traffic with AWS infrastructure
+3. **Cost Effective**: Pay only for what you use
+4. **Global Delivery**: Integrate with CloudFront for worldwide CDN
+5. **Security**: Fine-grained access control with IAM
+
+By following this guide, you now have a robust file storage solution that scales with your Django application and provides reliable, fast access to your media files from anywhere in the world.

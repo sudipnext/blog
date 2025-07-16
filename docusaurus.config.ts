@@ -34,13 +34,7 @@ const config: Config = {
     [
       "classic",
       {
-        docs: {
-          exclude: ["**/any/dir/**"],
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
-          // editUrl:
-          // 'https://github.com/facebook/docusaurus/tree/main/packages/create-docusaurus/templates/shared/',
-        },
+        docs: false, // Disable docs to avoid route conflicts
         blog: {
           routeBasePath: '/',
           showReadingTime: true,
