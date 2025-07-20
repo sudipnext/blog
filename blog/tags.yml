@@ -277,3 +277,33 @@ mathematics:
   label: Mathematics
   permalink: /mathematics
   description: Fundamental mathematical concepts and techniques used in programming and data science.
+
+algorithms:
+  label: Algorithms
+  permalink: /algorithms
+  description: Efficient problem-solving techniques and algorithmic patterns for coding interviews and software development.
+
+sliding-window:
+  label: Sliding Window
+  permalink: /sliding-window
+  description: A powerful algorithmic technique for optimizing array and string problems with contiguous elements.
+
+optimization:
+  label: Optimization
+  permalink: /optimization
+  description: Techniques and strategies for improving algorithm performance and reducing time complexity.
+
+data-structures:
+  label: Data Structures
+  permalink: /data-structures
+  description: Fundamental data structures and their applications in programming and computer science.
+
+problem-solving:
+  label: Problem Solving
+  permalink: /problem-solving
+  description: Strategies and approaches for tackling complex programming challenges and coding interview problems.
+
+interview-prep:
+  label: Interview Prep
+  permalink: /interview-prep
+  description: Resources and guides for preparing for technical coding interviews and assessments.

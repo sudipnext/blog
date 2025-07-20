@@ -1,0 +1,72 @@
+---
+slug: linked-lists
+title: Linked Lists - Complete Guide with Visualizations
+authors:
+  - sudipnext
+tags:
+  - data-structures
+  - linked-lists
+  - algorithms
+---
+
+# Linked Lists - Complete Guide with Visualizations
+
+Linked lists are fundamental linear data structures where elements are stored in nodes, and each node contains data and a reference (or link) to the next node in the sequence. Unlike arrays, linked lists don't store elements in contiguous memory locations.
+
+import LinkedListVisualizer from '@site/src/component/linkedListVisualizer';
+
+## Interactive Linked List Visualizer
+
+Explore different types of linked lists with interactive visualizations below!
+
+<LinkedListVisualizer />
+
+## Types of Linked Lists
+
+### 1. **Singly Linked List**
+Each node points to the next node. Traversal is only possible in one direction.
+
+### 2. **Doubly Linked List**
+Each node has pointers to both the next and previous nodes, allowing bidirectional traversal.
+
+### 3. **Circular Linked List**
+The last node points back to the first node, creating a circular structure.
+
+### 4. **Doubly Circular Linked List**
+Combines features of both doubly and circular linked lists.
+
+## Key Operations
+
+### **Insertion**: Add new nodes at the beginning, middle, or end
+### **Deletion**: Remove nodes from any position
+### **Traversal**: Visit each node in the list
+### **Search**: Find nodes with specific values
+
+## Time Complexity
+
+| Operation | Singly | Doubly | Circular |
+|-----------|--------|--------|----------|
+| **Insert at Head** | O(1) | O(1) | O(1) |
+| **Insert at Tail** | O(n) | O(1)* | O(n) |
+| **Delete at Head** | O(1) | O(1) | O(1) |
+| **Delete at Tail** | O(n) | O(1)* | O(n) |
+| **Search** | O(n) | O(n) | O(n) |
+| **Traversal** | O(n) | O(n) | O(n) |
+
+*O(1) when tail pointer is maintained
+
+## Space Complexity: O(n) for all types
+
+## Advantages & Disadvantages
+
+### ✅ **Advantages:**
+- Dynamic size (can grow/shrink during runtime)
+- Efficient insertion/deletion at the beginning
+- Memory efficient (only allocates what's needed)
+- No memory waste (unlike arrays with fixed size)
+
+### ❌ **Disadvantages:**
+- No random access (must traverse from head)
+- Extra memory for storing pointers
+- Poor cache locality
+- Not suitable for binary search
